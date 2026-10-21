@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "自定义 HLS 播放器",
+  "version": "1.2.0",
+  "description": "捕获页面 HLS 视频流并用原生控件播放器直接播放（最简形式）",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": ["storage"],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "自定义 HLS 播放器",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.pzbaj.cc/*"],
+      "js": ["content/hook.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["*://*.pzbaj.cc/*"],
+      "js": ["hls/hls.min.js", "content/main.js"],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ]
+}

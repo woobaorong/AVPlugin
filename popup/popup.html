@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { width: 320px; margin: 0; font-family: "Segoe UI", "Microsoft YaHei", sans-serif; background: #17171d; color: #e8e8ee; }
+    .hd { padding: 12px 14px; font-size: 14px; font-weight: 700; background: linear-gradient(135deg,#F893B9,#7c5cff); color: #fff; }
+    .bd { padding: 12px 14px; font-size: 13px; }
+    .row { display: flex; gap: 8px; margin-top: 10px; }
+    button { flex: 1; padding: 8px 6px; border-radius: 8px; border: 1px solid #34343f; background: #26262f; color: #e8e8ee; font-size: 12.5px; cursor: pointer; }
+    button.primary { background: #F893B9; border-color: #F893B9; color: #fff; font-weight: 600; }
+    button:hover { filter: brightness(1.15); }
+    .url { margin-top: 10px; background: #1f1f27; border: 1px solid #2c2c36; border-radius: 8px; padding: 8px; font-size: 11px; color: #9fd2ff; word-break: break-all; max-height: 84px; overflow: auto; }
+    .st { margin-top: 8px; color: #8a8; font-size: 12px; }
+    .st.bad { color: #e88; }
+    .tip { margin-top: 12px; color: #778; font-size: 11.5px; line-height: 1.7; }
+    kbd { background: #26262f; border: 1px solid #3a3a46; border-radius: 4px; padding: 0 4px; font-size: 10.5px; color: #ccd; }
+  </style>
+</head>
+<body>
+  <div class="hd">自定义 HLS 播放器</div>
+  <div class="bd">
+    <div class="st" id="st">检查中…</div>
+    <div class="url" id="url" style="display:none"></div>
+    <div class="row">
+      <button class="primary" id="open">▶ 打开播放器</button>
+      <button id="copy">复制链接</button>
+      <button id="clear">清除</button>
+    </div>
+    <div class="tip">
+      用法：进入视频页并点击网站播放器的播放，捕获到 m3u8 后会<b>自动弹出</b>本播放器（原生控件，点一下视频即可用快捷键：<kbd>Space</kbd>播放 <kbd>←→</kbd>±5s <kbd>↑↓</kbd>音量 <kbd>M</kbd>静音 <kbd>F</kbd>/双击 全屏）。<br>
+      手动关闭后可点上方按钮重新打开。
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
