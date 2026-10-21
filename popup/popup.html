@@ -14,6 +14,12 @@
     .st { margin-top: 8px; color: #8a8; font-size: 12px; }
     .st.bad { color: #e88; }
     .tip { margin-top: 12px; color: #778; font-size: 11.5px; line-height: 1.7; }
+    .sec { margin-top: 14px; color: #99a; font-size: 12px; font-weight: 600; }
+    textarea {
+      width: 100%; margin-top: 6px; padding: 8px; border-radius: 8px;
+      border: 1px solid #34343f; background: #1f1f27; color: #cde;
+      font-size: 11.5px; font-family: Consolas, monospace; resize: vertical;
+    }
     kbd { background: #26262f; border: 1px solid #3a3a46; border-radius: 4px; padding: 0 4px; font-size: 10.5px; color: #ccd; }
   </style>
 </head>
@@ -31,6 +37,13 @@
       用法：进入视频页并点击网站播放器的播放，捕获到 m3u8 后会<b>自动弹出</b>本播放器（原生控件，点一下视频即可用快捷键：<kbd>Space</kbd>播放 <kbd>←→</kbd>±5s <kbd>↑↓</kbd>音量 <kbd>M</kbd>静音 <kbd>F</kbd>/双击 全屏）。<br>
       手动关闭后可点上方按钮重新打开。
     </div>
+    <div class="sec">匹配域名（一行一个，改完刷新视频页生效）</div>
+    <textarea id="domains" rows="3" spellcheck="false" placeholder="*://*.pzbaj.cc/*"></textarea>
+    <div class="row">
+      <button class="primary" id="saveDomains">保存匹配</button>
+      <button id="resetDomains">恢复默认</button>
+    </div>
+    <div class="tip" id="domTip"></div>
   </div>
   <script src="popup.js"></script>
 </body>
