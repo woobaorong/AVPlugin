@@ -23,7 +23,6 @@
       });
       video = document.createElement('video');
       video.controls = true;
-      video.autoplay = true;
       Object.assign(video.style, { width: '100%', height: '100%', background: '#000' });
       const close = document.createElement('button');
       close.textContent = '✕ 关闭';
@@ -58,8 +57,7 @@
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = url; // Safari
     }
-    const p = video.play();
-    if (p && p.catch) p.catch(() => { video.muted = true; video.play().catch(() => {}); });
+    // 不自动播放：预载缓冲，等用户手动点播放（保持有声状态）
   }
 
   function closePlayer() {
