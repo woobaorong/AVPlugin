@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "自定义 HLS 播放器",
-  "version": "1.4.0",
-  "description": "捕获页面 HLS 视频流并用原生控件播放器直接播放（最简形式），匹配域名可在弹窗中随时修改",
+  "version": "1.5.0",
+  "description": "捕获页面 HLS 视频流并用原生控件播放器直接播放，匹配域名可在弹窗中随时修改；迅雷网盘文件条目支持一键播放（Space 暂停 / 左键快退 / 右键快进）",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
