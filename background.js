@@ -4,6 +4,7 @@
  */
 
 const DEFAULT_DOMAINS = ['*://*.pzbaj.cc/*'];
+const PATTERN_RE = /^(\*|https?):\/\/(\*|(\*\.)?[^/*:]+)\/.*$/;
 
 // avp-* 两个脚本：MAIN world 捕获钩子 + 隔离世界播放器（域名随用户配置）
 // xlp-* 两个脚本：迅雷网盘固定注入（文件条目播放按钮 + 自带播放器），不随用户域名配置变化
@@ -17,7 +18,13 @@ const SCRIPTS = [
 async function applyRegistration() {
   try {
     const { avpDomains } = await chrome.storage.local.get('avpDomains');
-    const matches = Array.isArray(avpDomains) && avpDomains.length ? avpDomains : DEFAULT_DOMAINS;
+    // 只保留格式合法的域名，坏条目不拖垮整体注册
+    const raw = Array.isArray(avpDomains) ? avpDomains : [];
+    const matches = raw.filter((p) => typeof p === 'string' && PATTERN_RE.test(p));
+    if (matches.length < raw.length) {
+      console.warn('[AVP] 忽略无效域名:', raw.filter((p) => !matches.includes(p)));
+    }
+    if (!matches.length) matches.push(...DEFAULT_DOMAINS);
 
     // 先清掉旧注册再按新域名注册
     const registered = await chrome.scripting.getRegisteredContentScripts();

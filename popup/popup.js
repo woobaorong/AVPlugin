@@ -40,29 +40,44 @@ document.getElementById('clear').addEventListener('click', () => {
   });
 });
 
-/* ---------- 匹配域名配置 ---------- */
+/* ---------- 匹配域名配置（数组，可添加多个） ---------- */
 
 const DEFAULT_DOMAINS = ['*://*.pzbaj.cc/*'];
-const domainsBox = document.getElementById('domains');
+const domList = document.getElementById('domList');
 const domTip = document.getElementById('domTip');
 const PATTERN_RE = /^(\*|https?):\/\/(\*|(\*\.)?[^/*:]+)\/.*$/;
 
-chrome.storage.local.get('avpDomains', (d) => {
-  domainsBox.value = (d.avpDomains && d.avpDomains.length ? d.avpDomains : DEFAULT_DOMAINS).join('\n');
-});
-
-function saveDomains(list) {
-  chrome.storage.local.set({ avpDomains: list }, () => {
-    domTip.textContent = '已保存并生效，刷新视频页即可（无需重装扩展）';
-    domTip.style.color = '#8c8';
-    domainsBox.value = list.join('\n');
+function addRow(value) {
+  const row = document.createElement('div');
+  row.className = 'domrow';
+  const input = document.createElement('input');
+  input.value = value || '';
+  input.placeholder = '*://*.example.com/*';
+  input.spellcheck = false;
+  const del = document.createElement('button');
+  del.className = 'del';
+  del.textContent = '✕';
+  del.title = '删除此域名';
+  del.addEventListener('click', () => {
+    row.remove();
+    if (!domList.children.length) addRow(''); // 至少留一行可编辑
   });
+  row.append(input, del);
+  domList.appendChild(row);
 }
 
+chrome.storage.local.get('avpDomains', (d) => {
+  const list = d.avpDomains && d.avpDomains.length ? d.avpDomains : DEFAULT_DOMAINS;
+  list.forEach((v) => addRow(v));
+  if (!list.length) addRow('');
+});
+
+document.getElementById('addDomain').addEventListener('click', () => addRow(''));
+
 document.getElementById('saveDomains').addEventListener('click', () => {
-  const list = domainsBox.value.split('\n').map((s) => s.trim()).filter(Boolean);
+  const list = [...domList.querySelectorAll('input')].map((i) => i.value.trim()).filter(Boolean);
   if (!list.length) {
-    domTip.textContent = '至少保留一行域名';
+    domTip.textContent = '至少保留一个域名';
     domTip.style.color = '#e88';
     return;
   }
@@ -72,7 +87,17 @@ document.getElementById('saveDomains').addEventListener('click', () => {
     domTip.style.color = '#e88';
     return;
   }
-  saveDomains(list);
+  chrome.storage.local.set({ avpDomains: list }, () => {
+    domTip.textContent = '已保存 ' + list.length + ' 个域名并生效，刷新视频页即可（无需重装扩展）';
+    domTip.style.color = '#8c8';
+  });
 });
 
-document.getElementById('resetDomains').addEventListener('click', () => saveDomains([...DEFAULT_DOMAINS]));
+document.getElementById('resetDomains').addEventListener('click', () => {
+  domList.innerHTML = '';
+  DEFAULT_DOMAINS.forEach((v) => addRow(v));
+  chrome.storage.local.set({ avpDomains: [...DEFAULT_DOMAINS] }, () => {
+    domTip.textContent = '已恢复默认并生效';
+    domTip.style.color = '#8c8';
+  });
+});
