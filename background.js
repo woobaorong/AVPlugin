@@ -12,7 +12,7 @@ const SCRIPTS = [
   { id: 'avp-hook', world: 'MAIN', js: ['content/hook.js'] },
   { id: 'avp-main', js: ['hls/hls.min.js', 'content/main.js'] },
   { id: 'xlp-hook', world: 'MAIN', js: ['content/xunlei-hook.js'], matches: ['*://*.xunlei.com/*'], allFrames: true },
-  { id: 'xlp-main', js: ['content/xunlei.js'], matches: ['*://*.xunlei.com/*'], allFrames: true },
+  { id: 'xlp-main', js: ['hls/hls.min.js', 'content/xunlei.js'], matches: ['*://*.xunlei.com/*'], allFrames: true },
 ];
 
 async function applyRegistration() {

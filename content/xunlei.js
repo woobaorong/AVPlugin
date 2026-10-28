@@ -80,7 +80,7 @@
     });
 
     const close = document.createElement('button');
-    close.textContent = '✕ 关闭 (Esc)';
+    close.textContent = 'X';
     Object.assign(close.style, {
       position: 'absolute', top: '10px', right: '14px', padding: '5px 12px',
       borderRadius: '8px', border: '1px solid #555', background: 'rgba(30,30,30,.85)',
