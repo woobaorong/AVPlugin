@@ -9,6 +9,10 @@
   window.__AVP_XLP_UI__ = true;
 
   const MARKER = '__AVP_XLP__';
+  const VERSION = '1.5.2';
+  // 版本标记写到 DOM 上：隔离世界的 console 日志未必看得见，属性可供页面控制台直接查验
+  document.documentElement.dataset.avpXlp = VERSION;
+  console.log('[AVP] 迅雷播放器增强已加载 v' + VERSION + '（含全屏按钮）');
   const VIDEO_RE = /\.(mp4|mkv|mov|m4v|avi|wmv|flv|ts|webm|rmvb)$/i;
   const ROW_SEL = 'li[class*="SourceListItem__item"]';
   const NAME_SEL = '[class*="SourceListItem__name"]';
@@ -52,7 +56,7 @@
 
   /* ================= 播放器 UI ================= */
 
-  let host, video, titleEl, playBtn, fill, track, timeEl, toastEl;
+  let host, video, titleEl, playBtn, fsBtn, fill, track, timeEl, toastEl;
   let seq = 0;              // 加载序号，丢弃过期的直链响应
   let pendingGet = null;    // 等待中的取直链请求 { id, btn, cb }
 
@@ -80,7 +84,7 @@
     });
 
     const close = document.createElement('button');
-    close.textContent = 'X';
+    close.textContent = '✕ 关闭'; // 版本签名：旧版这里是单字符 X
     Object.assign(close.style, {
       position: 'absolute', top: '10px', right: '14px', padding: '5px 12px',
       borderRadius: '8px', border: '1px solid #555', background: 'rgba(30,30,30,.85)',
@@ -119,10 +123,23 @@
       color: '#ccc', fontSize: '12px', minWidth: '120px', textAlign: 'center',
       userSelect: 'none', flexShrink: '0'
     });
-    bar.append(playBtn, track, timeEl);
+    /* 全屏按钮：放在底部控制条最右侧，用文字避免符号缺字渲染不出来 */
+    fsBtn = document.createElement('button');
+    fsBtn.textContent = '全屏';
+    fsBtn.title = '全屏/退出全屏 (F)';
+    Object.assign(fsBtn.style, {
+      minWidth: '52px', height: '28px', padding: '0 10px', borderRadius: '8px',
+      border: '1px solid #555', background: 'rgba(40,40,40,.9)', color: '#eee',
+      fontSize: '13px', cursor: 'pointer', flexShrink: '0'
+    });
+    fsBtn.addEventListener('click', toggleFullscreen);
+    bar.append(playBtn, track, timeEl, fsBtn);
 
     host.append(video, titleEl, close, bar);
     document.documentElement.appendChild(host);
+
+    /* 同步全屏按钮图标（Esc/浏览器等方式退出全屏时也能更新） */
+    document.addEventListener('fullscreenchange', updateFsBtn);
 
     /* 进度条：点击/拖动定位 */
     let dragging = false;
@@ -170,7 +187,8 @@
         case 'ArrowUp': video.volume = Math.min(1, video.volume + 0.1); showToast('音量 ' + Math.round(video.volume * 100) + '%'); e.preventDefault(); break;
         case 'ArrowDown': video.volume = Math.max(0, video.volume - 0.1); showToast('音量 ' + Math.round(video.volume * 100) + '%'); e.preventDefault(); break;
         case 'm': case 'M': video.muted = !video.muted; showToast(video.muted ? '已静音' : '取消静音'); e.preventDefault(); break;
-        case 'Escape': closePlayer(); break;
+        case 'f': case 'F': toggleFullscreen(); e.preventDefault(); break;
+        case 'Escape': if (document.fullscreenElement) { document.exitFullscreen().catch(() => {}); e.preventDefault(); } else closePlayer(); break;
       }
     });
   }
@@ -193,6 +211,25 @@
   }
 
   function togglePlay() { if (video.paused) video.play().catch(() => {}); else video.pause(); }
+
+  function updateFsBtn() {
+    if (!fsBtn) return;
+    const fs = document.fullscreenElement === host;
+    fsBtn.textContent = fs ? '收缩' : '全屏';
+    fsBtn.title = (fs ? '退出全屏' : '全屏') + ' (F)';
+  }
+
+  /* 全屏切换：进入/退出，失败（被站点拦截等）给提示 */
+  function toggleFullscreen() {
+    if (!host) return;
+    if (document.fullscreenElement === host) {
+      document.exitFullscreen().catch(() => { showToast('退出全屏失败'); });
+    } else if (host.requestFullscreen) {
+      host.requestFullscreen()
+        .then(updateFsBtn)
+        .catch(() => { showToast('全屏请求被拒绝'); });
+    }
+  }
 
   function seekBy(sec) {
     const dur = video.duration;
@@ -264,7 +301,7 @@
     host.style.display = '';
     startSuppressing(); // 我们的播放器打开期间，官方播放器一律隐形
     if (!document.fullscreenElement && host.requestFullscreen) {
-      host.requestFullscreen().catch(() => { /* 全屏被拒绝则保持窗口模式 */ });
+      host.requestFullscreen().then(updateFsBtn).catch(() => { /* 全屏被拒绝则保持窗口模式 */ });
     }
     titleEl.textContent = name;
     try { video.pause(); video.removeAttribute('src'); video.load(); } catch (e) { /* ignore */ }
